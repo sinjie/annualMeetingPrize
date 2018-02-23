@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>年会摇奖</title>
+	<style>
+		* {
+			font-family: '宋体';
+		}
+		body {
+			margin: 0;
+			height: 100%;
+			width: 100%;
+			background-color: black;
+		}
+		#div {
+			height: 1080px;
+			width: 1920px;
+			overflow: hidden;
+			position: relative;
+			background-color: rgba(55,55,55,.1);
+		}
+		#img {
+			display: block;
+			width: 100%;
+			position: relative;
+			top: -40px;
+			margin: auto;
+		}
+		#box {
+			position: absolute;
+			top: 550px;
+			left: 680px;
+			width: 600px;
+		}
+		#number {
+			overflow: hidden;
+			padding: 10% 15%;
+			height: 70%;
+		}
+		#number div {
+			box-sizing: border-box;
+			float: left;
+			width: 33%;
+			height: 150px;
+			font-size: 46px;
+			font-weight: 600;
+			border: 2px solid red;
+			background: yellow;
+			line-height: 150px;
+			text-align: center;
+		}
+		#btns {
+			overflow: hidden;
+			width: 60%;
+			margin: auto;
+		}
+		#btns div {
+			float: left;
+			width: 50%;
+			text-align: center;
+		}
+		#btns button {
+			width: 80px;
+			height: 40px;
+			font-size: 18px;
+			background-color: red;
+			color: white;
+			border: none;
+			border-radius: 10px;
+		}
+		#btns button:hover {
+			color: yellow;
+			background-color: #d00;
+		}
+		#btns button:focus {
+			border: 1px solid #000;
+		}
+		#winning-list {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 200%;
+			height: 50px;
+			overflow: hidden;
+			line-height: 50px;
+			color: white;
+			background: rgba(0,10,10,.7);
+			box-shadow: 0px 4px rgba(0,0,0,.8);
+		}
+		#winning-list h2 {
+			text-align: center;
+		}
+		#winning-list p {
+			float: left;
+			margin: 0 20px;
+			width: 260px;
+			font-size: 26px;
+			padding-left: 5px;
+		}
+		#show-winning {
+			position: absolute;
+			top: 470px;
+			left: 700px;
+			width: 530px;
+			height: 60px;
+			overflow: hidden;
+			padding-left: 10px;
+			background-image: linear-gradient(180deg, #a00 0%, #d00 40%, #f00 60%, #d00 80%, #a00 100%);
+			font-size: 52px;
+			color: yellow;
+			font-weight: 600;
+			text-shadow: 2px 1px #066;
+			box-shadow: 0 0 10px #a88;
+		}
+		#show-winning p {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			margin: 0;
+			padding: 0;
+		}
+		@keyframes in {
+			from {
+				top: 60px;
+			}
+			to {
+				top: 0;
+			}
+		}
+		@keyframes out {
+			from {
+				top: 0;
+			}
+			to {
+				top: -60px;
+				visibility: hidden;
+			}
+		}
+		.in {
+			animation: in linear 1000ms both;
+			z-index: 1;
+		}
+		.out {
+			animation: out linear 1000ms both;
+			z-index: 0;
+		}
+		#icon {
+			position: absolute;
+			left: 1400px;
+			top: 600px;
+			display: block;
+			width: 36px;
+			height: 40px;
+			padding: 0;
+			line-height: 40px;
+			cursor: pointer;
+			outline: none;
+			border: 1px solid #fff;
+			box-shadow: 2px 2px rgba(0,0,0,.6);
+			background: rgba(0,0,0,.1);
+			font-size: 60px;
+			color: white;
+		}
+		#icon:hover {
+			left: 1398px;
+			top: 598px;
+			width: 38px;
+			height: 42px;
+			box-shadow: 3px 3px rgba(0,0,0,.6);
+		}
+		/* 弹出框 */
+		#table {
+			position: absolute;
+			left: 900px;
+			top: 370px;
+			z-index: -1;
+			transform: scale(.1,.1);
+			opacity: 0;
+			width: 1000px;
+			height: 500px;
+			color: white;
+			background: rgba(0,0,0,.9);
+		}
+		#table h1 {
+			text-align: center;
+		}
+		#table div {
+			width: 100%;
+			padding: 0 15px;
+			font-size: 20px;
+		}
+		#table p {
+			width: 97%;
+			overflow: hidden;
+		}
+		#table p span {
+			margin-right: 20px;
+		}
+		#table #lucky div+span{
+			margin-left: 90px;
+		}
+		#table i {
+			position: absolute;
+			right: 20px;
+			top: 10px;
+			font-size: 18px;
+			font-weight: 700;
+			text-shadow: 0 1px rgba(250,250,0,1);
+			cursor: pointer;
+		}
+		@keyframes close {
+			from {
+				z-index: 10;
+				opacity: 1;
+				left: 450px;
+				top: 360px;
+				transform: scale(1,1);
+
+			}
+			to {
+				z-index: -1;
+				left: 900px;
+				top: 370px;
+				transform: scale(.1,1) rotateX(-90deg);
+				opacity: 0;
+			}
+		}
+		#table.close-table {
+			animation: close 500ms both;
+		}
+		@keyframes open {
+			0% {
+				opacity: 1;
+			}
+			to {
+				z-index: 10;
+				opacity: 1;
+				left: 450px;
+				top: 360px;
+				transform: scale(1,1);
+			}
+		}
+		#table.open-table {
+			animation: open 800ms both;
+		}
+	</style>
+</head>
+<body>
+<div id="div">
+	<img id="img" src="./yaojiang.jpg"/><!-- 背景 -->
+	<div id="box">
+		<div id="number">
+			<div id="d1">*</div>
+			<div id="d2">*</div>
+			<div id="d3">*</div>
+		</div>
+		<div id="btns">
+			<div>
+				<button id="start" onclick="start()">开始</button>
+			</div>
+			<div>
+				<button id="stop" onclick="stop()">暂停</button>
+			</div>
+		</div>
+	</div><!-- 摇奖区 -->
+	<div id="winning-list"></div><!-- 头部滚动条 -->
+	<div id="show-winning">
+		<p></p>
+		<p></p>
+	</div><!-- 滚动当前中奖名单 -->
+	<button id="icon" onclick="openTable()">=</button>
+	<div id="table">
+		<i onclick="closeTable()">—</i>
+		<h1>中奖名单</h1>
+		<div>
+			<p id="first">
+				<span>一等奖</span>
+			</p>
+			<p id="second">
+				<span>二等奖</span>
+			</p>
+			<p id="third">
+				<span>三等奖</span>
+			</p>
+			<p id="lucky">
+				<span>幸运奖</span>
+			</p>
+		</div>
+	</div><!-- 中奖列表表格 -->
+</div>
+<script>
+	var ku = {
+	    0: {type:'一等奖',num:'**********001'},
+	    1: {type:'二等奖',num:'**********346'},
+	    2: {type:'二等奖',num:'**********855'},
+	    3: {type:'三等奖',num:'**********270'},
+	    4: {type:'三等奖',num:'**********023'},
+	    5: {type:'三等奖',num:'**********123'},
+	    6: {type:'幸运奖',num:'**********691'},
+	    7: {type:'幸运奖',num:'**********975'},
+	    8: {type:'幸运奖',num:'**********921'},
+	    9: {type:'幸运奖',num:'**********134'},
+	    10: {type:'幸运奖',num:'**********008'},
+	    11: {type:'幸运奖',num:'**********257'},
+	    12: {type:'幸运奖',num:'**********127'},
+	    13: {type:'幸运奖',num:'**********984'},
+	    14: {type:'幸运奖',num:'**********854'},
+	    15: {type:'幸运奖',num:'**********057'},
+	    16: {type:'幸运奖',num:'**********187'},
+	    17: {type:'幸运奖',num:'**********137'},
+	    18: {type:'幸运奖',num:'**********555'},
+	    19: {type:'幸运奖',num:'**********457'},
+	    20: {type:'幸运奖',num:'**********312'},
+	    21: {type:'幸运奖',num:'**********245'},
+	    22: {type:'幸运奖',num:'**********222'},
+	    23: {type:'幸运奖',num:'**********787'},
+	    24: {type:'幸运奖',num:'**********999'},
+	    25: {type:'幸运奖',num:'**********317'}
+	}, length = 26, content = length, flag = true;
+	//id选择器
+	function $(ele) {
+		return document.getElementById(ele);
+    }
+    //等待图片加载完成，定义样式
+    $('img').onload = function (e) {
+        e.target.style.display = 'block';
+
+    };
+	//尺寸定义
+    window.onresize = function () {
+
+    };
+    //close table
+	function closeTable() {
+		$('table').setAttribute('class','close-table')
+    }
+    //open table
+	function openTable() {
+		$('table').setAttribute('class','open-table')
+    }
+    //数字滚动
+	function Roll(ele) {
+        this.ele = ele;
+        this.timer;
+		this.start = function () {
+            this.timer = window.setInterval(function () {
+                $(this.ele).innerHTML = parseInt(Math.random()*10);
+            }.bind(this),0)
+        };
+        this.stop = function (number) {
+			clearInterval(this.timer);
+			this.timer = null;
+            $(this.ele).innerHTML = number;
+        }
+    }
+    var d1 = new Roll('d1'),
+		d2 = new Roll('d2'),
+		d3 = new Roll('d3');
+	//抽取随机号码
+    function getRandom() {
+        var random = Math.random(), index = parseInt(random*length);
+        if (ku[index]){
+            return index;
+        }else{
+            return getRandom()
+        }
+    }
+    //提取随机号码
+    function getNumber() {
+        var index = getRandom(), number = ku[index];
+        ku[index] = false;
+        return number;
+    }
+    //开始抽奖
+	function start(){
+        if (content == 0) return alert('奖抽完啦 ╮(￣▽￣”)╭ ');
+        content-=1;
+        $('start').setAttribute('disabled','disabled');
+        $('stop').removeAttribute('disabled','disabled');
+        d1.start();
+        d2.start();
+        d3.start();
+	}
+	//停止抽奖
+	function stop() {
+        var obj = getNumber(), winning = obj.num,type = obj.type;
+        $('stop').setAttribute('disabled','disabled');
+        d1.stop(winning[10]);
+		window.setTimeout(function () {
+			d2.stop(winning[11])
+        },1000);
+		window.setTimeout(function () {
+			d3.stop(winning[12]);
+			//头部滚动
+			var p = document.createElement('p');
+			p.innerHTML = type + ':' + winning;
+			$('winning-list').appendChild(p);
+            $('start').removeAttribute('disabled','disabled');
+			if($('winning-list').childNodes.length>6 && flag){
+			    flag = false;
+			    run();
+			}
+			//滚轮显示
+            var active = document.getElementsByClassName('out')[0]?
+				document.getElementsByClassName('out')[0]:
+				$('show-winning').firstElementChild,
+				out = document.getElementsByClassName('in')[0]?
+                    document.getElementsByClassName('in')[0]:
+                    $('show-winning').lastElementChild;
+            active.innerHTML = type + winning;
+            active.setAttribute('class','in');
+			out.setAttribute('class','out');
+
+			//表格显示
+            var span = '';
+			if(type == '一等奖'){
+                createSpan('first')
+			}else if(type == '二等奖'){
+                createSpan('second')
+            }else if(type == '三等奖'){
+                createSpan('third')
+            }else if(type == '幸运奖'){
+                createSpan('lucky');
+				if(document.getElementsByClassName('luckyspan').length%6 == 0){
+                    $('lucky').appendChild(document.createElement('div'));
+				}
+            }else {
+                alert('出BUG啦~｀（✿﹃＿﹃〣）')
+			}
+			//添加中奖项
+			function createSpan(ele) {
+                span = document.createElement('span');
+                span.innerHTML = winning;
+                span.setAttribute('class',ele+'span')
+                $(ele).appendChild(span);
+            }
+        },2000)
+    }
+
+    //头部滚动条
+	function run() {
+		var timer = window.setInterval(function () {
+            var ele = $('winning-list').firstElementChild, lt = ele.style.marginLeft || 20;
+            lt = parseInt(lt);
+            ele.style.marginLeft = lt-1 +'px';
+            if(lt == -300){
+                ele.style.marginLeft = '20px';
+                $('winning-list').appendChild(ele);
+			}
+        },50)
+    }
+</script>
+</body>
+</html>
